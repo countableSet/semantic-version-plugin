@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
 
-class HelloWorldPluginTest {
+class SemanticVersionPluginTest {
 
     @TempDir
     lateinit var testProjectDir: File
@@ -23,7 +23,7 @@ class HelloWorldPluginTest {
         val result = GradleRunner.create()
             .withPluginClasspath()
             .withProjectDir(testProjectDir)
-            .withArguments("hello")
+            .withArguments("semanticVersion")
             .build()
         println(result.output)
     }
