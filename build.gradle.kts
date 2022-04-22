@@ -1,6 +1,5 @@
 plugins {
     `java-gradle-plugin`
-//    id("org.gradle.kotlin.kotlin-dsl") version "2.3.3"
     kotlin("jvm") version "1.6.21"
 }
 
@@ -11,6 +10,8 @@ repositories {
 dependencies {
     testImplementation(platform("org.junit:junit-bom:5.8.2"))
     testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.13.2")
+    testImplementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.2")
 }
 
 gradlePlugin {
