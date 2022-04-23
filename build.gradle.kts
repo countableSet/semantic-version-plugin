@@ -1,7 +1,7 @@
 plugins {
     `java-gradle-plugin`
     `kotlin-dsl`
-    kotlin("jvm") version "1.6.21"
+    `maven-publish`
 }
 
 repositories {
@@ -19,6 +19,7 @@ gradlePlugin {
     plugins {
         create("semanticVersionPlugin") {
             id = "dev.poolside.gradle.semantic-version"
+            group = "dev.poolside.gradle.semanticversion"
             implementationClass = "dev.poolside.gradle.semanticversion.SemanticVersionPlugin"
             version = "0.1.0"
         }

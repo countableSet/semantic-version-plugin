@@ -12,7 +12,7 @@ abstract class SemanticVersionTask : DefaultTask() {
     @TaskAction
     fun setVersion() {
         val publication = project.extensions.getByType(PublishingExtension::class.java).publications.first() as MavenPublication
-        val dep = project.dependencies.create(group = publication.groupId, name = publication.artifactId, version = "#{publication.version}+")
+        val dep = project.dependencies.create(group = publication.groupId, name = publication.artifactId, version = "${publication.version}+")
         val conf = project.rootProject.configurations.detachedConfiguration(dep)
         conf.isTransitive = false
         conf.resolutionStrategy.cacheDynamicVersionsFor(0, TimeUnit.SECONDS)
