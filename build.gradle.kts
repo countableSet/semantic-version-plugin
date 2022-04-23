@@ -1,5 +1,6 @@
 plugins {
     `java-gradle-plugin`
+    `kotlin-dsl`
     kotlin("jvm") version "1.6.21"
 }
 

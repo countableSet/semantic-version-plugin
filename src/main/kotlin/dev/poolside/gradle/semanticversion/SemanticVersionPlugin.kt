@@ -2,15 +2,16 @@ package dev.poolside.gradle.semanticversion
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
+import org.gradle.api.tasks.compile.JavaCompile
+import org.gradle.kotlin.dsl.withType
 
 class SemanticVersionPlugin : Plugin<Project> {
     override fun apply(project: Project) {
-        project.tasks.create("semanticVersion", PublishToMavenRepository::class.java) {
-            println("Hello from the GreetingPlugin")
-//            doLast {
-//                println("Hello from the GreetingPlugin")
-//            }
+        project.tasks.register("semanticVersion", SemanticVersionTask::class.java) {
+            this.description = "Determines and sets the semantic version"
+        }
+        project.tasks.withType<JavaCompile> {
+            this.dependsOn("semanticVersion")
         }
     }
 }
