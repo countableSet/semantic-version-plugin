@@ -140,7 +140,7 @@ class SemanticVersionPluginTest {
             .withPluginClasspath()
             .withProjectDir(testProjectDir)
             .withArguments("publish", "--stacktrace")
-//            .withDebug(true)
+            .withDebug(true)
             .build()
         testProjectDir.walk().filter { it.name.startsWith("pom") }.forEach { pomFile ->
             pomFile.forEachLine { println(it) }
