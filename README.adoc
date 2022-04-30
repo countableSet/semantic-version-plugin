@@ -1,0 +1,11 @@
+= Semantic Version Gradle Plugin
+
+Determines patch version based on what already exists in maven repository.
+
+[source,kotlin]
+----
+plugins {
+    `maven-publish`
+    id("dev.poolside.gradle.semantic-version") version "0.1.0"
+}
+----

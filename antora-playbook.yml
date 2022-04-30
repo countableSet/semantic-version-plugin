@@ -1,0 +1,13 @@
+site:
+  title: Semantic Version Plugin
+content:
+  sources:
+    - url: ./
+      start_path: docs
+      branches: HEAD
+output:
+  clean: true
+ui:
+  bundle:
+    url: https://github.com/countableSet/antora-ui/releases/download/b2213746648/ui-bundle.zip
+    snapshot: true
