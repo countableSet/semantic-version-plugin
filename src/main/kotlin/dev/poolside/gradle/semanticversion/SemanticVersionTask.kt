@@ -53,20 +53,25 @@ abstract class SemanticVersionTask : DefaultTask() {
     private fun rewrite(pub: MavenPublication) {
         pub.pom.withXml {
             val root = this.asElement()
-            val dependencies = root.getElementsByTagName("dependencies").item(0).childNodes
-            var count = 0
-            while(count < dependencies.length) {
-                if (dependencies.item(count) is Element) {
-                    val dep = dependencies.item(count) as Element
-                    val group = dep.getElementsByTagName("groupId").item(0).textContent
-                    val artifact = dep.getElementsByTagName("artifactId").item(0).textContent
-                    val key = "${group}:${artifact}"
-                    if (versions.containsKey(key)) {
-                        val version = versions[key]
-                        dep.getElementsByTagName("version").item(0).textContent = version
+            val dependencies = root.getElementsByTagName("dependencies")
+            var outerCount = 0
+            while(outerCount < dependencies.length) {
+                val children = dependencies.item(outerCount).childNodes
+                var innerCount = 0
+                while(innerCount < children.length) {
+                    if (children.item(innerCount) is Element) {
+                        val dep = children.item(innerCount) as Element
+                        val group = dep.getElementsByTagName("groupId").item(0).textContent
+                        val artifact = dep.getElementsByTagName("artifactId").item(0).textContent
+                        val key = "${group}:${artifact}"
+                        if (versions.containsKey(key)) {
+                            val version = versions[key]
+                            dep.getElementsByTagName("version").item(0).textContent = version
+                        }
                     }
+                    innerCount++
                 }
-                count++
+                outerCount++
             }
         }
     }
