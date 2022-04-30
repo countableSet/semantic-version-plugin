@@ -4,10 +4,27 @@ content:
   sources:
     - url: ./
       start_path: docs
-      branches: HEAD
+      edit_url: https://github.com/countableSet/semantic-version-plugin/blob/{refname}/{path}
 output:
   clean: true
 ui:
   bundle:
     url: https://github.com/countableSet/antora-ui/releases/download/b2213746648/ui-bundle.zip
     snapshot: true
+  supplemental_files:
+    - path: partials/header-content.hbs
+      contents: |
+        <header class="header">
+          <nav class="navbar">
+            <div class="navbar-brand">
+              <a class="navbar-item" href="{{{or site.url siteRootPath}}}">{{site.title}}</a>
+            </div>
+            <div id="topbar-nav" class="navbar-menu">
+              <div class="navbar-end">
+                <div class="navbar-item">
+                  <a id="themeSwitch" class="themeSwitch" href="#"></a>
+                </div>
+              </div>
+            </div>
+          </nav>
+        </header>
