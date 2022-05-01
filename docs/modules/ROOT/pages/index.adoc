@@ -1,4 +1,4 @@
-= Welcome
+= Home
 
 Gradle plugin to auto-increment patch version on each call to `publish` task by looking up the most recent version published in the configured maven repository.
 

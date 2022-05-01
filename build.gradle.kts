@@ -45,7 +45,7 @@ tasks {
 }
 
 pluginBundle {
-    website = "https://github.com/johndoe/GradlePlugins"
+    website = "https://semantic-version.gradle.poolside.dev"
     vcsUrl = "https://github.com/countableSet/semantic-version-plugin"
     description = "Based on a given major.minor version, plugin determines patch version based on what is already " +
             "maven repository by auto incrementing it to produce the next version number. Major or minor versions " +

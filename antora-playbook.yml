@@ -21,6 +21,8 @@ ui:
             </div>
             <div id="topbar-nav" class="navbar-menu">
               <div class="navbar-end">
+                <a class="navbar-item" href="#">Home</a>
+                <a class="navbar-item" href="https://github.com/countableSet/semantic-version-plugin">Github</a>
                 <div class="navbar-item">
                   <a id="themeSwitch" class="themeSwitch" href="#"></a>
                 </div>
