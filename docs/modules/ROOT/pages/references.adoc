@@ -15,3 +15,32 @@ Editing groovy dom nodes/nodelists/etc is a pain in kotlin. I found these links 
 . link:https://github.com/Kotlin/kotlinx.dom/blob/0fe219d942047468b361dc0594f1c443ebcf26c3/src/main/kotlin/Dom.kt[kotlinx.dom]
 . link:https://github.com/gradle/kotlin-dsl-samples/issues/225[kotlin-dsl-sample issue]
 . link:https://github.com/nebula-plugins/nebula-publishing-plugin/blob/575b55c72151e0fae35c4aea69ff77ae8db57455/src/main/groovy/nebula/plugin/publishing/maven/MavenRemoveInvalidDependenciesPlugin.groovy[groovy example]
+
+== Gradle Plugin Publishing
+
+* link:https://plugins.gradle.org/docs/publish-plugin-new[plugin docs]
+* link:https://plugins.gradle.org/u/poolside[user account]
+
+[source,bash]
+----
+❯ gr publishPlugins
+
+> Task :publishPlugins
+Publishing plugin dev.poolside.gradle.semantic-version version 0.1.0
+Thank you. Your new plugin dev.poolside.gradle.semantic-version has been submitted for approval by Gradle engineers. The request should be processed within the next few days, at which point you will be contacted via email.
+Publishing artifact build/publications/pluginMaven/module.json
+Publishing artifact build/publications/pluginMaven/pom-default.xml
+Publishing artifact build/libs/semantic-version-plugin-0.1.0.jar
+Publishing artifact build/libs/semantic-version-plugin-0.1.0-sources.jar
+Publishing artifact build/libs/semantic-version-plugin-0.1.0-javadoc.jar
+Activating plugin dev.poolside.gradle.semantic-version version 0.1.0
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 8.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+See https://docs.gradle.org/7.4.2/userguide/command_line_interface.html#sec:command_line_warnings
+
+BUILD SUCCESSFUL in 5s
+10 actionable tasks: 7 executed, 3 up-to-date
+----
