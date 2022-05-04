@@ -1,6 +1,6 @@
 = Semantic Version Gradle Plugin
 
-Determines patch version based on what already exists in maven repository. More info in link:https://semantic-version-plugin.pages.dev/[docs].
+Determines patch version based on what already exists in maven repository. More info in link:https://semantic-version.gradle.poolside.dev/[docs].
 
 == Usage
 
