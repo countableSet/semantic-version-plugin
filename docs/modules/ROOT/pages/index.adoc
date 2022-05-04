@@ -2,6 +2,10 @@
 
 Gradle plugin to auto-increment patch version on each call to `publish` task by looking up the most recent version published in the configured maven repository.
 
+image::semantic-version-plugin.svg[]
+
+== Import
+
 [source,kotlin]
 ----
 plugins {
@@ -17,4 +21,32 @@ $ ./gradlw publish
 > Task :semanticVersion
 Resolved published version of 'dev.poolside.test:my-library:0.1.4' to '0.1.5'
 [...]
+----
+
+== Usage
+
+Basic full example, but it can also be used for subprojects and bom subprojects. However, make sure the publication version number is in the format of `[\d]+\.[\d]+`.
+
+[source,kotlin]
+----
+plugins {
+    java
+    `maven-publish`
+    id("dev.poolside.gradle.semantic-version") version "0.1.0"
+}
+repositories {
+    mavenCentral()
+}
+
+group = "dev.poolside.test"
+version = "0.1"
+
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            artifactId = "my-library"
+            from(components["java"])
+        }
+    }
+}
 ----
