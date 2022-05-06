@@ -6,6 +6,8 @@ image::semantic-version-plugin.svg[]
 
 == Import
 
+link:https://plugins.gradle.org/plugin/dev.poolside.gradle.semantic-version[Plugins Page]
+
 [source,kotlin]
 ----
 plugins {

@@ -10,6 +10,7 @@ class SemanticVersionPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         project.tasks.register("semanticVersion", SemanticVersionTask::class.java) {
             this.description = "Determines and sets the semantic version"
+            this.group = "publishing"
         }
         project.tasks.withType<JavaCompile> {
             this.dependsOn("semanticVersion")
