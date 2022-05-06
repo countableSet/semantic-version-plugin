@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit
 
 abstract class SemanticVersionTask : DefaultTask() {
 
+    private val versionRegex = "^\\d+\\.\\d+\$".toRegex()
     private val versions = mutableMapOf<String, String>()
 
     @TaskAction
@@ -17,6 +18,7 @@ abstract class SemanticVersionTask : DefaultTask() {
         project.allprojects.forEach { p ->
             p.extensions.getByType(PublishingExtension::class.java).publications.forEach { publication ->
                 val pub = publication as MavenPublication
+                checkVersion(pub.version)
                 val (key, version) = findVersion(pub)
                 pub.version = version
                 versions[key] = version
@@ -25,6 +27,12 @@ abstract class SemanticVersionTask : DefaultTask() {
                 val pub = publication as MavenPublication
                 rewrite(pub)
             }
+        }
+    }
+
+    private fun checkVersion(version: String) {
+        if (!versionRegex.matches(version)) {
+            throw IllegalArgumentException("Invalid version, must be in format $versionRegex")
         }
     }
 

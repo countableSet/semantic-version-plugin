@@ -1,11 +1,16 @@
 package dev.poolside.gradle.semanticversion
 
 import org.gradle.testkit.runner.GradleRunner
+import org.gradle.testkit.runner.TaskOutcome.FAILED
+import org.gradle.testkit.runner.UnexpectedBuildFailure
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Assertions.fail
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.io.TempDir
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import java.io.File
 
 class SemanticVersionPluginTest {
@@ -278,5 +283,47 @@ class SemanticVersionPluginTest {
             }
         }
         assertTrue(valid.isEmpty())
+    }
+
+    @ParameterizedTest(name = "{index} invalid version {0}")
+    @ValueSource(strings = ["0.1.0", "1", "10.0.0-SNAPSHOT", "1.0-SNAPSHOT", "SNAPSHOT"])
+    fun `invalid version`(version: String) {
+        val build = """
+            plugins {
+                java
+                `maven-publish`
+                id("dev.poolside.gradle.semantic-version")
+            }
+            repositories {
+                maven { url = uri("${mavenRepo.absolutePath}") }
+            }
+            group = "dev.poolside.test"
+            version = "$version"
+            publishing {
+                repositories {
+                    maven { url = uri("${mavenRepo.absolutePath}") }
+                }
+                publications {
+                    create<MavenPublication>("mavenJava") {
+                        artifactId = "my-library"
+                        from(components["java"])
+                    }
+                }
+            }
+        """.trimIndent()
+        val settings = """rootProject.name = "testing""""
+        File(testProjectDir, "build.gradle.kts").writeText(build)
+        File(testProjectDir, "settings.gradle.kts").writeText(settings)
+        val exception = assertThrows<UnexpectedBuildFailure> {
+            GradleRunner.create()
+                .withPluginClasspath()
+                .withProjectDir(testProjectDir)
+                .withArguments("publish")
+//            .withDebug(true)
+                .build()
+        }
+        val result = exception.buildResult
+        assertTrue(result.output.contains("Invalid version, must be in format ^\\d+\\.\\d+\$"))
+        assertEquals(FAILED, result.task(":semanticVersion")?.outcome)
     }
 }
