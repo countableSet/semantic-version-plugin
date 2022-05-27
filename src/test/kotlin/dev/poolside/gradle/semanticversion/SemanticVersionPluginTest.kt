@@ -4,9 +4,11 @@ import org.gradle.api.internal.artifacts.ivyservice.ivyresolve.strategy.DefaultV
 import org.gradle.api.internal.artifacts.ivyservice.ivyresolve.strategy.Version
 import org.gradle.api.internal.artifacts.ivyservice.ivyresolve.strategy.VersionParser
 import org.gradle.testkit.runner.GradleRunner
+import org.gradle.testkit.runner.TaskOutcome
 import org.gradle.testkit.runner.TaskOutcome.FAILED
 import org.gradle.testkit.runner.UnexpectedBuildFailure
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Assertions.fail
 import org.junit.jupiter.api.Test
@@ -342,5 +344,66 @@ class SemanticVersionPluginTest {
             }
         }
         assertEquals("0.1.2", latestVersion.toString())
+    }
+
+    @Test
+    fun `manual versioning`() {
+        val build = """
+            plugins {
+                java
+                `maven-publish`
+                id("dev.poolside.gradle.semantic-version")
+            }
+            repositories {
+                maven { url = uri("${mavenRepo.absolutePath}") }
+            }
+            group = "dev.poolside.test"
+            version = "0.1.0"
+            semanticVersion {
+                manual = true
+            }
+            publishing {
+                repositories {
+                    maven { url = uri("${mavenRepo.absolutePath}") }
+                }
+                publications {
+                    create<MavenPublication>("mavenJava") {
+                        artifactId = "my-library"
+                        from(components["java"])
+                    }
+                }
+            }
+        """.trimIndent()
+        val settings = """rootProject.name = "testing""""
+        File(testProjectDir, "build.gradle.kts").writeText(build)
+        File(testProjectDir, "settings.gradle.kts").writeText(settings)
+        GradleRunner.create()
+            .withPluginClasspath()
+            .withProjectDir(testProjectDir)
+            .withArguments("publish")
+//            .withDebug(true)
+            .build()
+        var pomFile = testProjectDir.walk().filter { it.name.startsWith("pom") }.first()
+        var pom = PomParser.parse(pomFile.absolutePath)
+        assertEquals("0.1.0", pom.version)
+        var jarFile = mavenRepo.walk().filter { it.name.endsWith("jar") }.first()
+        assertTrue(jarFile.absolutePath.endsWith("/dev/poolside/test/my-library/0.1.0/my-library-0.1.0.jar"))
+        val publishedPom = mavenRepo.walk().filter { it.name.equals("my-library-0.1.0.pom") }.first()
+        pom = PomParser.parse(publishedPom.absolutePath)
+        assertEquals("0.1.0", pom.version)
+
+        // should skip
+        val result = GradleRunner.create()
+            .withPluginClasspath()
+            .withProjectDir(testProjectDir)
+            .withArguments("publish")
+//            .withDebug(true)
+            .build()
+        assertEquals(1, result.taskPaths(TaskOutcome.SKIPPED).size)
+        pomFile = testProjectDir.walk().filter { it.name.startsWith("pom") }.last()
+        pom = PomParser.parse(pomFile.absolutePath)
+        assertEquals("0.1.0", pom.version)
+        jarFile = mavenRepo.walk().filter { it.name.endsWith("jar") }.last()
+        assertFalse(jarFile.absolutePath.endsWith("/dev/poolside/test/my-library/0.1.1/my-library-0.1.1.jar"))
     }
 }

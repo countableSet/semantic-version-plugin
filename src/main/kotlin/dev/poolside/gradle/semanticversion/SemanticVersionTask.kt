@@ -4,6 +4,8 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.internal.artifacts.repositories.ResolutionAwareRepository
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
+import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 import org.w3c.dom.Element
 
@@ -12,8 +14,19 @@ abstract class SemanticVersionTask : DefaultTask() {
     private val versionRegex = "^\\d+\\.\\d+\$".toRegex()
     private val versions = mutableMapOf<String, String>()
 
+    @Input
+    var manual: Boolean = false
+
     @TaskAction
     fun setVersion() {
+        if (manual) {
+            manual()
+        } else {
+            automatic()
+        }
+    }
+
+    private fun automatic() {
         project.allprojects.forEach { p ->
             val extension = p.extensions.getByType(PublishingExtension::class.java)
             extension.repositories.forEach {
@@ -31,6 +44,29 @@ abstract class SemanticVersionTask : DefaultTask() {
             extension.publications.forEach { publication ->
                 val pub = publication as MavenPublication
                 rewrite(pub)
+            }
+        }
+    }
+
+    private fun manual() {
+        project.allprojects.forEach { p ->
+            val extension = p.extensions.getByType(PublishingExtension::class.java)
+            extension.repositories.forEach {
+                if (it is ResolutionAwareRepository) {
+                    val resolver = it.createResolver()
+                    extension.publications.forEach { publication ->
+                        val pub = publication as MavenPublication
+                        val exists = VersionFinder.versionExists(logger, project, resolver, pub)
+                        project.tasks.withType(PublishToMavenRepository::class.java).configureEach {
+                            onlyIf {
+                                if (exists) {
+                                    logger.lifecycle("Resolved published version of '${publication.groupId}:${publication.artifactId}:${publication.version}' already exists")
+                                }
+                                !exists
+                            }
+                        }
+                    }
+                }
             }
         }
     }

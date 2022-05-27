@@ -19,21 +19,9 @@ object VersionFinder {
     private val versionComparator = DefaultVersionComparator().asVersionComparator()
 
     fun findVersion(logger: Logger, project: Project, resolver: ConfiguredModuleComponentRepository, publication: MavenPublication): Pair<String, String> {
-        val remote = resolver.remoteAccess
-        val local = resolver.localAccess
-
-        val dep = project.dependencies.create(group = publication.groupId, name = publication.artifactId, version = "${publication.version}+")
-        val selector = DefaultModuleComponentSelector.newSelector(dep.module, dep.versionConstraint)
-        val metadata = GradleDependencyMetadata(selector, Collections.emptyList(), false, false, null, false, null)
-
-        val result = DefaultBuildableModuleVersionListingResolveResult()
-        remote.listModuleVersions(metadata, result)
-        local.listModuleVersions(metadata, result)
-
-        logger.debug("Resolved versions ${result.versions}")
-
+        val versions = listVersions(logger, project, resolver, publication, "${publication.version}+")
         var latestVersion: Version? = null
-        result.versions.map { version -> versionParser.transform(version) }.forEach { version ->
+        versions.map { version -> versionParser.transform(version) }.forEach { version ->
             if (latestVersion == null || versionComparator.compare(version, latestVersion) > 0) {
                 latestVersion = version
             }
@@ -49,6 +37,28 @@ object VersionFinder {
             newVersion
         }
         return "${publication.groupId}:${publication.artifactId}" to version
+    }
+
+    fun versionExists(logger: Logger, project: Project, resolver: ConfiguredModuleComponentRepository, publication: MavenPublication): Boolean {
+        val versions = listVersions(logger, project, resolver, publication, publication.version)
+        return versions.contains(publication.version)
+    }
+
+    private fun listVersions(logger: Logger, project: Project, resolver: ConfiguredModuleComponentRepository, publication: MavenPublication, versionSearch: String): Set<String> {
+        val remote = resolver.remoteAccess
+        val local = resolver.localAccess
+
+        val dep = project.dependencies.create(group = publication.groupId, name = publication.artifactId, version = versionSearch)
+        val selector = DefaultModuleComponentSelector.newSelector(dep.module, dep.versionConstraint)
+        val metadata = GradleDependencyMetadata(selector, Collections.emptyList(), false, false, null, false, null)
+
+        val result = DefaultBuildableModuleVersionListingResolveResult()
+        remote.listModuleVersions(metadata, result)
+        local.listModuleVersions(metadata, result)
+
+        logger.debug("Resolved versions ${result.versions}")
+
+        return result.versions
     }
 
     private fun incrementVersion(version: Version): String {

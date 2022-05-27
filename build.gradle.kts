@@ -32,7 +32,7 @@ gradlePlugin {
             id = "dev.poolside.gradle.semantic-version"
             group = "dev.poolside.gradle.semanticversion"
             implementationClass = "dev.poolside.gradle.semanticversion.SemanticVersionPlugin"
-            version = "0.1.2"
+            version = "0.1.3"
             displayName = "Poolside Semantic Version Plugin"
         }
     }
