@@ -1,12 +1,11 @@
 package dev.poolside.gradle.semanticversion
 
 import org.gradle.api.DefaultTask
+import org.gradle.api.internal.artifacts.repositories.ResolutionAwareRepository
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.tasks.TaskAction
-import org.gradle.kotlin.dsl.create
 import org.w3c.dom.Element
-import java.util.concurrent.TimeUnit
 
 abstract class SemanticVersionTask : DefaultTask() {
 
@@ -16,14 +15,20 @@ abstract class SemanticVersionTask : DefaultTask() {
     @TaskAction
     fun setVersion() {
         project.allprojects.forEach { p ->
-            p.extensions.getByType(PublishingExtension::class.java).publications.forEach { publication ->
-                val pub = publication as MavenPublication
-                checkVersion(pub.version)
-                val (key, version) = findVersion(pub)
-                pub.version = version
-                versions[key] = version
+            val extension = p.extensions.getByType(PublishingExtension::class.java)
+            extension.repositories.forEach {
+                if (it is ResolutionAwareRepository) {
+                    val resolver = it.createResolver()
+                    extension.publications.forEach { publication ->
+                        val pub = publication as MavenPublication
+                        checkVersion(pub.version)
+                        val (key, version) = VersionFinder.findVersion(logger, project, resolver, pub)
+                        pub.version = version
+                        versions[key] = version
+                    }
+                }
             }
-            p.extensions.getByType(PublishingExtension::class.java).publications.forEach { publication ->
+            extension.publications.forEach { publication ->
                 val pub = publication as MavenPublication
                 rewrite(pub)
             }
@@ -34,28 +39,6 @@ abstract class SemanticVersionTask : DefaultTask() {
         if (!versionRegex.matches(version)) {
             throw IllegalArgumentException("Invalid version, must be in format $versionRegex")
         }
-    }
-
-    private fun findVersion(publication: MavenPublication): Pair<String, String> {
-        val dep = project.dependencies.create(group = publication.groupId, name = publication.artifactId, version = "${publication.version}+")
-        val conf = project.rootProject.configurations.detachedConfiguration(dep)
-        conf.isTransitive = false
-        conf.resolutionStrategy.cacheDynamicVersionsFor(0, TimeUnit.SECONDS)
-        conf.resolutionStrategy.cacheChangingModulesFor(0, TimeUnit.SECONDS)
-        val lenientConfiguration = conf.resolvedConfiguration.lenientConfiguration
-        val version = if (lenientConfiguration.unresolvedModuleDependencies.isEmpty()) {
-            val resolved = conf.resolvedConfiguration.firstLevelModuleDependencies.first()
-            val version = resolved.moduleVersion.split(".")
-            val patch = version[2].toInt()+1
-            val newVersion = "${version[0]}.${version[1]}.$patch"
-            logger.lifecycle("Resolved published version of '${resolved.moduleGroup}:${resolved.moduleName}:${resolved.moduleVersion}' to '$newVersion'")
-            newVersion
-        } else {
-            val newVersion = "${publication.version}.0"
-            logger.lifecycle("No published version of '${publication.groupId}:${publication.artifactId}:${publication.version}' resolved to '$newVersion'")
-            newVersion
-        }
-        return "${publication.groupId}:${publication.artifactId}" to version
     }
 
     private fun rewrite(pub: MavenPublication) {

@@ -1,5 +1,8 @@
 package dev.poolside.gradle.semanticversion
 
+import org.gradle.api.internal.artifacts.ivyservice.ivyresolve.strategy.DefaultVersionComparator
+import org.gradle.api.internal.artifacts.ivyservice.ivyresolve.strategy.Version
+import org.gradle.api.internal.artifacts.ivyservice.ivyresolve.strategy.VersionParser
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome.FAILED
 import org.gradle.testkit.runner.UnexpectedBuildFailure
@@ -325,5 +328,19 @@ class SemanticVersionPluginTest {
         val result = exception.buildResult
         assertTrue(result.output.contains("Invalid version, must be in format ^\\d+\\.\\d+\$"))
         assertEquals(FAILED, result.task(":semanticVersion")?.outcome)
+    }
+
+    @Test
+    fun `version parser`() {
+        val versionParser = VersionParser()
+        val versionComparator = DefaultVersionComparator().asVersionComparator()
+        val versions = listOf("0.1.0", "0.1.1", "0.1.2")
+        var latestVersion: Version? = null
+        versions.map { version -> versionParser.transform(version) }.forEach { version ->
+            if (latestVersion == null || versionComparator.compare(version, latestVersion) > 0) {
+                latestVersion = version
+            }
+        }
+        assertEquals("0.1.2", latestVersion.toString())
     }
 }
