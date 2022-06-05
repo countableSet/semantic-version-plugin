@@ -15,18 +15,29 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.io.TempDir
 import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
 import java.io.File
+import java.util.stream.Stream
 
 class SemanticVersionPluginTest {
+
+    companion object {
+        @JvmStatic
+        private fun gradleVersions(): Stream<Arguments> = Stream.of(
+            Arguments.of("7.4.2")
+        )
+    }
 
     @TempDir
     lateinit var testProjectDir: File
     @TempDir
     lateinit var mavenRepo: File
 
-    @Test
-    fun `project version set correctly`() {
+    @ParameterizedTest(name = "{index} gradle version {0}")
+    @MethodSource("gradleVersions")
+    fun `project version set correctly`(gradleVersion: String) {
         val build = """
             plugins {
                 java
@@ -56,6 +67,7 @@ class SemanticVersionPluginTest {
         GradleRunner.create()
             .withPluginClasspath()
             .withProjectDir(testProjectDir)
+            .withGradleVersion(gradleVersion)
             .withArguments("publish")
 //            .withDebug(true)
             .build()
@@ -72,6 +84,7 @@ class SemanticVersionPluginTest {
         GradleRunner.create()
             .withPluginClasspath()
             .withProjectDir(testProjectDir)
+            .withGradleVersion(gradleVersion)
             .withArguments("publish")
 //            .withDebug(true)
             .build()
@@ -85,8 +98,9 @@ class SemanticVersionPluginTest {
         assertEquals("0.1.1", pom.version)
     }
 
-    @Test
-    fun `modules version is set correctly`() {
+    @ParameterizedTest(name = "{index} gradle version {0}")
+    @MethodSource("gradleVersions")
+    fun `modules version is set correctly`(gradleVersion: String) {
         val build = """
             plugins {
                 java
@@ -150,6 +164,7 @@ class SemanticVersionPluginTest {
         GradleRunner.create()
             .withPluginClasspath()
             .withProjectDir(testProjectDir)
+            .withGradleVersion(gradleVersion)
             .withArguments("publish")
 //            .withDebug(true)
             .build()
@@ -162,7 +177,7 @@ class SemanticVersionPluginTest {
             "${mavenRepo.absolutePath}/dev/poolside/test/my-library/0.1.0/my-library-0.1.0.jar",
             "${mavenRepo.absolutePath}/dev/poolside/test/my-sublibrary/0.1.0/my-sublibrary-0.1.0.jar"
         )
-        mavenRepo.walk().filter { it.name.endsWith(".jar") }.forEach {jarFile ->
+        mavenRepo.walk().filter { it.name.endsWith(".jar") }.forEach { jarFile ->
             if (valid.contains(jarFile.absolutePath)) {
                 valid.remove(jarFile.absolutePath)
             } else {
@@ -172,8 +187,9 @@ class SemanticVersionPluginTest {
         assertTrue(valid.isEmpty())
     }
 
-    @Test
-    fun `bom version set correct`() {
+    @ParameterizedTest(name = "{index} gradle version {0}")
+    @MethodSource("gradleVersions")
+    fun `bom version set correct`(gradleVersion: String) {
         val build = """
             plugins {
                 `java-library`
@@ -268,6 +284,7 @@ class SemanticVersionPluginTest {
         GradleRunner.create()
             .withPluginClasspath()
             .withProjectDir(testProjectDir)
+            .withGradleVersion(gradleVersion)
             .withArguments("publish")
 //            .withDebug(true)
             .build()
@@ -280,7 +297,7 @@ class SemanticVersionPluginTest {
             "${mavenRepo.absolutePath}/dev/poolside/test/my-library/0.1.0/my-library-0.1.0.jar",
             "${mavenRepo.absolutePath}/dev/poolside/test/my-sublibrary/0.1.0/my-sublibrary-0.1.0.jar"
         )
-        mavenRepo.walk().filter { it.name.endsWith(".jar") }.forEach {jarFile ->
+        mavenRepo.walk().filter { it.name.endsWith(".jar") }.forEach { jarFile ->
             if (valid.contains(jarFile.absolutePath)) {
                 valid.remove(jarFile.absolutePath)
             } else {
@@ -346,8 +363,9 @@ class SemanticVersionPluginTest {
         assertEquals("0.1.2", latestVersion.toString())
     }
 
-    @Test
-    fun `manual versioning`() {
+    @ParameterizedTest(name = "{index} gradle version {0}")
+    @MethodSource("gradleVersions")
+    fun `manual versioning`(gradleVersion: String) {
         val build = """
             plugins {
                 java
@@ -380,6 +398,7 @@ class SemanticVersionPluginTest {
         GradleRunner.create()
             .withPluginClasspath()
             .withProjectDir(testProjectDir)
+            .withGradleVersion(gradleVersion)
             .withArguments("publish")
 //            .withDebug(true)
             .build()
@@ -396,6 +415,7 @@ class SemanticVersionPluginTest {
         val result = GradleRunner.create()
             .withPluginClasspath()
             .withProjectDir(testProjectDir)
+            .withGradleVersion(gradleVersion)
             .withArguments("publish")
 //            .withDebug(true)
             .build()

@@ -24,7 +24,13 @@ jobs:
       with:
         java-version: ${{ matrix.java }}
         distribution: 'zulu'
-    - name: Build with Gradle
-      uses: gradle/gradle-build-action@0d13054264b0bb894ded474f08ebb30921341cee
+    - name: Setup Gradle
+      uses: gradle/gradle-build-action@v2
+    - name: Build
+      run: ./gradlew build
+    - name: Upload build reports
+      if: always()
+      uses: actions/upload-artifact@v3
       with:
-        arguments: build
+        name: build-reports
+        path: build/reports/
