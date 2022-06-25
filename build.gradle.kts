@@ -13,8 +13,8 @@ dependencies {
     testImplementation(platform("org.junit:junit-bom:5.8.2"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.junit.jupiter:junit-jupiter-params")
-    testImplementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.12.6")
-    testImplementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.2")
+    testImplementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.13.3")
+    testImplementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.3")
 }
 
 pluginBundle {
