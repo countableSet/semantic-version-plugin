@@ -8,7 +8,6 @@ import org.gradle.testkit.runner.TaskOutcome
 import org.gradle.testkit.runner.TaskOutcome.FAILED
 import org.gradle.testkit.runner.UnexpectedBuildFailure
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Assertions.fail
 import org.junit.jupiter.api.Test
@@ -74,8 +73,8 @@ class SemanticVersionPluginTest {
         var pomFile = testProjectDir.walk().filter { it.name.startsWith("pom") }.first()
         var pom = PomParser.parse(pomFile.absolutePath)
         assertEquals("0.1.0", pom.version)
-        var jarFile = mavenRepo.walk().filter { it.name.endsWith("jar") }.first()
-        assertTrue(jarFile.absolutePath.endsWith("/dev/poolside/test/my-library/0.1.0/my-library-0.1.0.jar"))
+        var jarFile = mavenRepo.walk().filter { it.name.endsWith("my-library-0.1.0.jar") }.first()
+        assertTrue(jarFile.absolutePath.endsWith("/dev/poolside/test/my-library/0.1.0/my-library-0.1.0.jar"), jarFile.absolutePath)
         var publishedPom = mavenRepo.walk().filter { it.name.equals("my-library-0.1.0.pom") }.first()
         pom = PomParser.parse(publishedPom.absolutePath)
         assertEquals("0.1.0", pom.version)
@@ -91,8 +90,8 @@ class SemanticVersionPluginTest {
         pomFile = testProjectDir.walk().filter { it.name.startsWith("pom") }.last()
         pom = PomParser.parse(pomFile.absolutePath)
         assertEquals("0.1.1", pom.version)
-        jarFile = mavenRepo.walk().filter { it.name.endsWith("jar") }.last()
-        assertTrue(jarFile.absolutePath.endsWith("/dev/poolside/test/my-library/0.1.1/my-library-0.1.1.jar"))
+        jarFile = mavenRepo.walk().filter { it.name.endsWith("my-library-0.1.1.jar") }.last()
+        assertTrue(jarFile.absolutePath.endsWith("/dev/poolside/test/my-library/0.1.1/my-library-0.1.1.jar"), jarFile.absolutePath)
         publishedPom = mavenRepo.walk().filter { it.name.equals("my-library-0.1.1.pom") }.last()
         pom = PomParser.parse(publishedPom.absolutePath)
         assertEquals("0.1.1", pom.version)
@@ -405,8 +404,8 @@ class SemanticVersionPluginTest {
         var pomFile = testProjectDir.walk().filter { it.name.startsWith("pom") }.first()
         var pom = PomParser.parse(pomFile.absolutePath)
         assertEquals("0.1.0", pom.version)
-        var jarFile = mavenRepo.walk().filter { it.name.endsWith("jar") }.first()
-        assertTrue(jarFile.absolutePath.endsWith("/dev/poolside/test/my-library/0.1.0/my-library-0.1.0.jar"))
+        val jarFile = mavenRepo.walk().filter { it.name.endsWith("my-library-0.1.0.jar") }.first()
+        assertTrue(jarFile.absolutePath.endsWith("/dev/poolside/test/my-library/0.1.0/my-library-0.1.0.jar"), jarFile.absolutePath)
         val publishedPom = mavenRepo.walk().filter { it.name.equals("my-library-0.1.0.pom") }.first()
         pom = PomParser.parse(publishedPom.absolutePath)
         assertEquals("0.1.0", pom.version)
@@ -423,7 +422,7 @@ class SemanticVersionPluginTest {
         pomFile = testProjectDir.walk().filter { it.name.startsWith("pom") }.last()
         pom = PomParser.parse(pomFile.absolutePath)
         assertEquals("0.1.0", pom.version)
-        jarFile = mavenRepo.walk().filter { it.name.endsWith("jar") }.last()
-        assertFalse(jarFile.absolutePath.endsWith("/dev/poolside/test/my-library/0.1.1/my-library-0.1.1.jar"))
+        val jarFiles = mavenRepo.walk().filter { it.name.endsWith("my-library-0.1.1.jar") }.toList()
+        assertTrue(jarFiles.isEmpty())
     }
 }
