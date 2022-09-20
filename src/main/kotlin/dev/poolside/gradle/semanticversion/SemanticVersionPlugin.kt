@@ -14,11 +14,15 @@ class SemanticVersionPlugin : Plugin<Project> {
             this.group = "publishing"
             this.manual = extension.manual
         }
-        project.tasks.withType<JavaCompile> {
-            this.dependsOn("semanticVersion")
+        project.allprojects.forEach { p ->
+            p.tasks.withType<JavaCompile> {
+                this.dependsOn(":semanticVersion")
+            }
         }
-        project.tasks.withType<GenerateMavenPom> {
-            this.dependsOn("semanticVersion")
+        project.allprojects.forEach { p ->
+            p.tasks.withType<GenerateMavenPom> {
+                this.dependsOn(":semanticVersion")
+            }
         }
     }
 }
