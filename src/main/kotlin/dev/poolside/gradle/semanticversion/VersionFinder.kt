@@ -32,7 +32,7 @@ object VersionFinder {
             logger.lifecycle("No published version of '${publication.groupId}:${publication.artifactId}:${publication.version}' resolved to '$newVersion'")
             newVersion
         } else {
-            val newVersion = incrementVersion(latestVersion!!)
+            val newVersion = compareAndIncrementVersion(versionParser.transform(publication.version), latestVersion!!)
             logger.lifecycle("Resolved published version of '${publication.groupId}:${publication.artifactId}:${publication.version}' to '$newVersion'")
             newVersion
         }
@@ -61,8 +61,16 @@ object VersionFinder {
         return result.versions
     }
 
-    private fun incrementVersion(version: Version): String {
-        val parts = version.numericParts.filterNotNull()
+    private fun compareAndIncrementVersion(original: Version, found: Version): String {
+        // major version bump
+        if (original.numericParts[0] > found.numericParts[0]) {
+            return original.source + ".0"
+        }
+        // minor version bump
+        if (original.numericParts[1] > found.numericParts[1]) {
+            return original.source + ".0"
+        }
+        val parts = found.numericParts.filterNotNull()
         val last = parts.last() + 1
         return parts.dropLast(1).joinToString(".") + ".$last"
     }
