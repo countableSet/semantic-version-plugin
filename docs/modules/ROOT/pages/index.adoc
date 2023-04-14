@@ -1,9 +1,28 @@
 = Home
-:version: 0.1.3
+:version: 0.2.0
 
-Gradle plugin to auto-increment patch version on each call to `publish` task by looking up the most recent version published in the configured maven repository.
+Gradle plugin to auto-increments the patch version on each call to the `publish` task by looking up the most recent version published in the publishing maven repository and adds it by one.
+
+Tested to work in the following scenarios:
+
+. Single root project publication
+. Single and multiple subprojects publication
+. BOM references via `api(platform(project(":bom")))` and `java-platform` plugin
+. Manual versioning, prevents the task from publishing if the version isn't different from the one in maven
 
 image::semantic-version-plugin.svg[]
+
+== Change Log
+
+* 0.2.x compatible with Java 11
+** 0.2.0 set compatability to Java 11, bump dependency versions, and upgrade gradle to 8.1
+* 0.1.x compatible with Java 8
+** 0.1.5 fix bug when the plugin wasn't applying correct to root projects without jars
+** 0.1.4 fix bug when major or minor version was bump was computed incorrectly
+** 0.1.3 adds manual mode flag to skip publishing when artifact already exists
+** 0.1.2 fix bug with version finder
+** 0.1.1 unknown
+** 0.1.0 unknown
 
 == Import
 

@@ -26,7 +26,9 @@ class SemanticVersionPluginTest {
         @JvmStatic
         private fun gradleVersions(): Stream<Arguments> = Stream.of(
             Arguments.of("7.4.2"),
-            Arguments.of("7.5.1")
+            Arguments.of("7.5.1"),
+            Arguments.of("7.6.1"),
+            Arguments.of("8.1")
         )
     }
 

@@ -1,8 +1,9 @@
 = Semantic Version Gradle Plugin
 
-Determines patch version based on what already exists in maven repository. More info in link:https://semantic-version.gradle.poolside.dev/[docs]. link:https://plugins.gradle.org/plugin/dev.poolside.gradle.semantic-version[Plugin].
+* link:https://semantic-version.gradle.poolside.dev/[docs]
+* link:https://plugins.gradle.org/plugin/dev.poolside.gradle.semantic-version[plugin site]
 
-== Usage
+tldr: determines and sets patch version based on what already exists in maven repository.
 
 [source,kotlin]
 ----
