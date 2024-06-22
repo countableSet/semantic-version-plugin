@@ -27,7 +27,7 @@ gradlePlugin {
             id = "dev.poolside.gradle.semantic-version"
             group = "dev.poolside.gradle.semanticversion"
             implementationClass = "dev.poolside.gradle.semanticversion.SemanticVersionPlugin"
-            version = "0.2.0"
+            version = "0.2.1"
             displayName = "Poolside Semantic Version Plugin"
             description = "Based on a given major.minor version, plugin determines patch version based on what is already " +
                     "maven repository by auto incrementing it to produce the next version number. Major or minor versions " +

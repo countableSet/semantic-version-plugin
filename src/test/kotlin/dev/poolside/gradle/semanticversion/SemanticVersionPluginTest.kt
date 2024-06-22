@@ -382,6 +382,7 @@ class SemanticVersionPluginTest {
             allprojects {
                 apply(plugin = "java-library")
                 apply(plugin = "maven-publish")
+                apply(plugin = "dev.poolside.gradle.semantic-version")
                 repositories {
                     mavenCentral()
                     maven { url = uri("${mavenRepo.absolutePath}") }
@@ -455,6 +456,7 @@ class SemanticVersionPluginTest {
             allprojects {
                 apply(plugin = "java-library")
                 apply(plugin = "maven-publish")
+                apply(plugin = "dev.poolside.gradle.semantic-version")
                 repositories {
                     mavenCentral()
                     maven { url = uri("${mavenRepo.absolutePath}") }
@@ -771,5 +773,114 @@ class SemanticVersionPluginTest {
         assertEquals("0.1.0", pom.version)
         val jarFiles = mavenRepo.walk().filter { it.name.endsWith("my-library-0.1.1.jar") }.toList()
         assertTrue(jarFiles.isEmpty())
+    }
+
+    @ParameterizedTest(name = "{index} gradle version {0}")
+    @MethodSource("gradleVersions")
+    fun `subproject only has plugin installed`(gradleVersion: String) {
+        val build = """
+            plugins {
+                `java`
+            }
+            allprojects {
+                apply(plugin = "java")
+                repositories {
+                    mavenCentral()
+                    maven { url = uri("${mavenRepo.absolutePath}") }
+                }
+                java {
+                    group = "dev.poolside.test"
+                }
+            }
+        """.trimIndent()
+        FileManager.writeFile(folder = testProjectDir, filename = "build.gradle.kts", content = build)
+        val settings = """
+            rootProject.name = "testing"
+            include("lib")
+            include("lib2")
+        """.trimIndent()
+        FileManager.writeFile(folder = testProjectDir, filename = "settings.gradle.kts", content = settings)
+        val libBuild = """
+            plugins {
+                `java-library`
+                `maven-publish`
+                id("dev.poolside.gradle.semantic-version")
+            }
+            java {
+                version = "0.1"
+            }
+            publishing {
+                publications {
+                    create<MavenPublication>("mavenJava") {
+                        artifactId = "my-sublibrary"
+                        from(components["java"])
+                    }
+                }
+                repositories {
+                    maven { url = uri("${mavenRepo.absolutePath}") }
+                }
+            }
+            dependencies {
+                api("org.apache.commons:commons-math3:3.6.1")
+                implementation("com.google.guava:guava:30.1.1-jre")
+            }
+        """.trimIndent()
+        FileManager.writeFile(folder = testProjectDir, path = "lib", filename = "build.gradle.kts", content = libBuild)
+        val lib2Build = """
+            plugins {
+                `java-library`
+                `maven-publish`
+                id("dev.poolside.gradle.semantic-version")
+            }
+            java {
+                version = "0.2"
+            }
+            publishing {
+                publications {
+                    create<MavenPublication>("mavenJava") {
+                        artifactId = "my-sublibrary2"
+                        from(components["java"])
+                    }
+                }
+                repositories {
+                    maven { url = uri("${mavenRepo.absolutePath}") }
+                }
+            }
+            dependencies {
+                api("org.apache.commons:commons-math3:3.6.1")
+                implementation("com.google.guava:guava:30.1.1-jre")
+            }
+        """.trimIndent()
+        FileManager.writeFile(folder = testProjectDir, path = "lib2", filename = "build.gradle.kts", content = lib2Build)
+        GradleRunner.create()
+            .withPluginClasspath()
+            .withProjectDir(testProjectDir)
+            .withGradleVersion(gradleVersion)
+            .withArguments(":lib:publish", ":lib2:publish")
+//            .withDebug(true)
+            .build()
+        testProjectDir.walk().filter { it.name.startsWith("pom") }.forEach { pomFile ->
+            pomFile.forEachLine { println(it) }
+            val pom = PomParser.parse(pomFile.absolutePath)
+            if (pom.artifactId == "my-sublibrary") {
+                assertEquals("0.1.0", pom.version)
+            } else if (pom.artifactId == "my-sublibrary2") {
+                assertEquals("0.2.0", pom.version)
+            } else {
+                fail()
+            }
+        }
+        val valid = mutableListOf(
+            "${mavenRepo.absolutePath}/dev/poolside/test/my-sublibrary/0.1.0/my-sublibrary-0.1.0.jar",
+            "${mavenRepo.absolutePath}/dev/poolside/test/my-sublibrary2/0.2.0/my-sublibrary2-0.2.0.jar"
+        )
+        mavenRepo.walk().filter { it.name.endsWith(".jar") }.forEach { jarFile ->
+            if (valid.contains(jarFile.absolutePath)) {
+                valid.remove(jarFile.absolutePath)
+            } else {
+                fail("missing jarfile ${jarFile.absolutePath}")
+            }
+        }
+        assertTrue(valid.isEmpty())
     }
 }
