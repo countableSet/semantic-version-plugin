@@ -2,7 +2,7 @@ plugins {
     `java-gradle-plugin`
     `kotlin-dsl`
     `maven-publish`
-    id("com.gradle.plugin-publish") version "1.2.0"
+    id("com.gradle.plugin-publish") version "1.2.1"
 }
 
 repositories {
@@ -10,11 +10,12 @@ repositories {
 }
 
 dependencies {
-    testImplementation(platform("org.junit:junit-bom:5.9.2"))
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation(platform("org.junit:junit-bom:5.10.2"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.junit.jupiter:junit-jupiter-params")
-    testImplementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.14.2")
-    testImplementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.14.2")
+    testImplementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.17.1")
+    testImplementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.17.1")
 }
 
 gradlePlugin {
