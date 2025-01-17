@@ -42,14 +42,17 @@ java {
     targetCompatibility = JavaVersion.VERSION_11
 }
 
+kotlin {
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
+    }
+}
+
 tasks {
     test {
         useJUnitPlatform()
         testLogging {
             events("passed", "skipped", "failed")
         }
-    }
-    withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        kotlinOptions.jvmTarget = JavaVersion.VERSION_11.toString()
     }
 }
