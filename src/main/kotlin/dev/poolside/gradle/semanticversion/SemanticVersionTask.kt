@@ -15,6 +15,8 @@ abstract class SemanticVersionTask : DefaultTask() {
     private val versions = mutableMapOf<String, String>()
 
     @Input
+    lateinit var extension: PublishingExtension
+    @Input
     var manual: Boolean = false
 
     @TaskAction
@@ -27,24 +29,21 @@ abstract class SemanticVersionTask : DefaultTask() {
     }
 
     private fun automatic() {
-        project.allprojects.forEach { p ->
-            val extension = p.extensions.getByType(PublishingExtension::class.java)
-            extension.repositories.forEach {
-                if (it is ResolutionAwareRepository) {
-                    val resolver = it.createResolver()
-                    extension.publications.forEach { publication ->
-                        val pub = publication as MavenPublication
-                        checkVersion(pub.version)
-                        val (key, version) = VersionFinder.findVersion(logger, project, resolver, pub)
-                        pub.version = version
-                        versions[key] = version
-                    }
+        extension.repositories.forEach {
+            if (it is ResolutionAwareRepository) {
+                val resolver = it.createResolver()
+                extension.publications.forEach { publication ->
+                    val pub = publication as MavenPublication
+                    checkVersion(pub.version)
+                    val (key, version) = VersionFinder.findVersion(logger, project, resolver, pub)
+                    pub.version = version
+                    versions[key] = version
                 }
             }
-            extension.publications.forEach { publication ->
-                val pub = publication as MavenPublication
-                rewrite(pub)
-            }
+        }
+        extension.publications.forEach { publication ->
+            val pub = publication as MavenPublication
+            rewrite(pub)
         }
     }
 

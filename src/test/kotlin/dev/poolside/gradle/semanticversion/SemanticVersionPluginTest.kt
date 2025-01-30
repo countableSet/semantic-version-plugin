@@ -322,6 +322,7 @@ class SemanticVersionPluginTest {
             plugins {
                 `java-library`
                 `maven-publish`
+                id("dev.poolside.gradle.semantic-version")
             }
             repositories {
                 mavenCentral()
@@ -578,6 +579,7 @@ class SemanticVersionPluginTest {
             plugins {
                 `java-library`
                 `maven-publish`
+                id("dev.poolside.gradle.semantic-version")
             }
             repositories {
                 mavenCentral()
@@ -603,6 +605,7 @@ class SemanticVersionPluginTest {
             plugins {
                 `java-platform`
                 `maven-publish`
+                id("dev.poolside.gradle.semantic-version")
             }
             repositories {
                 mavenCentral()
