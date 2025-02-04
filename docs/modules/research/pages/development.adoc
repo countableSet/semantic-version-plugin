@@ -1,0 +1,24 @@
+= Development
+
+link:https://docs.gradle.org/current/userguide/writing_plugins.html[Gradle docs] on writing plugins
+
+Publish to mavenLocal
+
+[source,bash]
+----
+❯ gr publishToMavenLocal
+
+BUILD SUCCESSFUL in 5s
+11 actionable tasks: 8 executed, 3 up-to-date
+----
+
+Add to `settings.gradle` file in client project and change the version `id 'dev.poolside.gradle.semantic-version' version '1.0.0'`
+
+[source,groovy]
+----
+pluginManagement {
+    repositories {
+        mavenLocal()
+    }
+}
+----

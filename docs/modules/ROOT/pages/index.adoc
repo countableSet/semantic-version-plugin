@@ -1,5 +1,5 @@
 = Home
-:version: 0.2.0
+:version: 1.0.0
 
 Gradle plugin to auto-increments the patch version on each call to the `publish` task by looking up the most recent version published in the publishing maven repository and adds it by one.
 
@@ -84,4 +84,29 @@ If there's a scenario in which you want to manually increment the semantic versi
 semanticVersion {
     manual = true
 }
+----
+
+== Gradle Version Requirement
+
+The plugin now requires Gradle version 8.12+ to access new access.
+
+[source,bash]
+----
+❯ gr semanticVersion
+> Task :client:semanticVersion FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':client:semanticVersion'.
+> org/gradle/api/internal/initialization/StandaloneDomainObjectContext
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 1s
+2 actionable tasks: 2 executed
 ----
