@@ -1,6 +1,7 @@
 package dev.poolside.gradle.semanticversion
 
 import org.gradle.api.DefaultTask
+import org.gradle.api.internal.artifacts.DependencyManagementServices
 import org.gradle.api.internal.artifacts.repositories.ResolutionAwareRepository
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
@@ -8,6 +9,7 @@ import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 import org.w3c.dom.Element
+import javax.inject.Inject
 
 abstract class SemanticVersionTask : DefaultTask() {
 
@@ -18,6 +20,9 @@ abstract class SemanticVersionTask : DefaultTask() {
     lateinit var extension: PublishingExtension
     @Input
     var manual: Boolean = false
+
+    @get:Inject
+    abstract val dependencyService: DependencyManagementServices
 
     @TaskAction
     fun setVersion() {
@@ -35,7 +40,7 @@ abstract class SemanticVersionTask : DefaultTask() {
                 extension.publications.forEach { publication ->
                     val pub = publication as MavenPublication
                     checkVersion(pub.version)
-                    val (key, version) = VersionFinder.findVersion(logger, project, resolver, pub)
+                    val (key, version) = VersionFinder.findVersion(logger, dependencyService, resolver, pub)
                     pub.version = version
                     versions[key] = version
                 }
@@ -48,21 +53,18 @@ abstract class SemanticVersionTask : DefaultTask() {
     }
 
     private fun manual() {
-        project.allprojects.forEach { p ->
-            val extension = p.extensions.getByType(PublishingExtension::class.java)
-            extension.repositories.forEach {
-                if (it is ResolutionAwareRepository) {
-                    val resolver = it.createResolver()
-                    extension.publications.forEach { publication ->
-                        val pub = publication as MavenPublication
-                        val exists = VersionFinder.versionExists(logger, project, resolver, pub)
-                        project.tasks.withType(PublishToMavenRepository::class.java).configureEach {
-                            onlyIf {
-                                if (exists) {
-                                    logger.lifecycle("Resolved published version of '${publication.groupId}:${publication.artifactId}:${publication.version}' already exists")
-                                }
-                                !exists
+        extension.repositories.forEach {
+            if (it is ResolutionAwareRepository) {
+                val resolver = it.createResolver()
+                extension.publications.forEach { publication ->
+                    val pub = publication as MavenPublication
+                    val exists = VersionFinder.versionExists(logger, dependencyService, resolver, pub)
+                    project.tasks.withType(PublishToMavenRepository::class.java).configureEach {
+                        onlyIf {
+                            if (exists) {
+                                logger.lifecycle("Resolved published version of '${publication.groupId}:${publication.artifactId}:${publication.version}' already exists")
                             }
+                            !exists
                         }
                     }
                 }

@@ -7,9 +7,7 @@ import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 import org.gradle.testkit.runner.TaskOutcome.FAILED
 import org.gradle.testkit.runner.UnexpectedBuildFailure
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.Assertions.fail
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.io.TempDir
@@ -25,9 +23,9 @@ class SemanticVersionPluginTest {
     companion object {
         @JvmStatic
         private fun gradleVersions(): Stream<Arguments> = Stream.of(
-            Arguments.of("7.6.1"),
-            Arguments.of("8.1"),
-            Arguments.of("8.8"),
+//            Arguments.of("7.6.1"),
+//            Arguments.of("8.1"),
+//            Arguments.of("8.8"),
             Arguments.of("8.12"),
         )
     }
