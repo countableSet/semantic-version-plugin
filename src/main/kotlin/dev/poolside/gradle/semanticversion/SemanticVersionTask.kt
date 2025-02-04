@@ -8,6 +8,7 @@ import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.TaskCollection
 import org.w3c.dom.Element
 import javax.inject.Inject
 
@@ -18,6 +19,8 @@ abstract class SemanticVersionTask : DefaultTask() {
 
     @Input
     lateinit var extension: PublishingExtension
+    @Input
+    lateinit var tasks: TaskCollection<PublishToMavenRepository>
     @Input
     var manual: Boolean = false
 
@@ -59,7 +62,7 @@ abstract class SemanticVersionTask : DefaultTask() {
                 extension.publications.forEach { publication ->
                     val pub = publication as MavenPublication
                     val exists = VersionFinder.versionExists(logger, dependencyService, resolver, pub)
-                    project.tasks.withType(PublishToMavenRepository::class.java).configureEach {
+                    tasks.configureEach {
                         onlyIf {
                             if (exists) {
                                 logger.lifecycle("Resolved published version of '${publication.groupId}:${publication.artifactId}:${publication.version}' already exists")
