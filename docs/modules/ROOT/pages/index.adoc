@@ -88,7 +88,7 @@ semanticVersion {
 
 == Gradle Version Requirement
 
-The plugin now requires Gradle version 8.12+ to access new access.
+The plugin now requires Gradle version 8.11+ to access new access.
 
 [source,bash]
 ----
