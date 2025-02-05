@@ -1,3 +1,0 @@
-* xref:references.adoc[]
-* xref:gradle-plugin.adoc[]
-* xref:development.adoc[]

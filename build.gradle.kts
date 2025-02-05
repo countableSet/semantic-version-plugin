@@ -19,7 +19,7 @@ dependencies {
 }
 
 gradlePlugin {
-    website.set("https://semantic-version.gradle.poolside.dev")
+    website.set("https://github.com/countableSet/semantic-version-plugin")
     vcsUrl.set("https://github.com/countableSet/semantic-version-plugin")
 
     plugins {
