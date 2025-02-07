@@ -31,7 +31,7 @@ gradlePlugin {
             displayName = "Poolside Semantic Version Plugin"
             description = "Based on a given major.minor version, plugin determines patch version based on what is already " +
                     "maven repository by auto incrementing it to produce the next version number. Major or minor versions " +
-                    "must be manually changed"
+                    "must be manually changed."
             tags.set(listOf("semantic version", "maven", "publish", "auto increment"))
         }
     }
