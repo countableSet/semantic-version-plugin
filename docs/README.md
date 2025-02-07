@@ -28,16 +28,6 @@ Tested to work in the following scenarios:
 
 See [releases](https://github.com/countableSet/semantic-version-plugin/releases) for changes.
 
-* 0.2.x compatible with Java 11
-  ** 0.2.0 set compatability to Java 11, bump dependency versions, and upgrade gradle to 8.1
-* 0.1.x compatible with Java 8
-  ** 0.1.5 fix bug when the plugin wasn't applying correct to root projects without jars
-  ** 0.1.4 fix bug when major or minor version was bump was computed incorrectly
-  ** 0.1.3 adds manual mode flag to skip publishing when artifact already exists
-  ** 0.1.2 fix bug with version finder
-  ** 0.1.1 unknown
-  ** 0.1.0 unknown
-
 ## Usage
 
 [Plugins Portal](https://plugins.gradle.org/plugin/dev.poolside.gradle.semantic-version)
