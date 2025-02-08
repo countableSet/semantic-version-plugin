@@ -12,7 +12,7 @@ import org.gradle.internal.component.external.model.DefaultModuleComponentSelect
 import org.gradle.internal.component.external.model.GradleDependencyMetadata
 import org.gradle.internal.resolve.result.DefaultBuildableModuleVersionListingResolveResult
 import org.gradle.kotlin.dsl.create
-import java.util.*
+import java.util.Collections
 
 object VersionFinder {
 
