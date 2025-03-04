@@ -86,7 +86,7 @@ semanticVersion {
 
 ## Gradle Version Requirement
 
-The plugin now requires Gradle version 8.11+ to access new access.
+The plugin now requires Gradle version 8.13+ to access new methods and public api changes from gradle.
 
 ```sh
 ❯ gr semanticVersion
