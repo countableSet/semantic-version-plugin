@@ -9,10 +9,9 @@ import org.gradle.api.internal.initialization.StandaloneDomainObjectContext
 import org.gradle.api.logging.Logger
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.internal.component.external.model.DefaultModuleComponentSelector
-import org.gradle.internal.component.external.model.GradleDependencyMetadata
+import org.gradle.internal.component.model.DefaultComponentOverrideMetadata
 import org.gradle.internal.resolve.result.DefaultBuildableModuleVersionListingResolveResult
 import org.gradle.kotlin.dsl.create
-import java.util.Collections
 
 object VersionFinder {
 
@@ -52,11 +51,10 @@ object VersionFinder {
         val handler = dependencyService.newDetachedResolver(StandaloneDomainObjectContext.ANONYMOUS).dependencyHandler
         val dep = handler.create(group = publication.groupId, name = publication.artifactId, version = versionSearch)
         val selector = DefaultModuleComponentSelector.newSelector(dep.module, dep.versionConstraint)
-        val metadata = GradleDependencyMetadata(selector, Collections.emptyList(), false, false, null, false, null)
 
         val result = DefaultBuildableModuleVersionListingResolveResult()
-        remote.listModuleVersions(metadata, result)
-        local.listModuleVersions(metadata, result)
+        remote.listModuleVersions(selector, DefaultComponentOverrideMetadata.EMPTY, result)
+        local.listModuleVersions(selector, DefaultComponentOverrideMetadata.EMPTY, result)
 
         logger.debug("Resolved versions ${result.versions}")
 
