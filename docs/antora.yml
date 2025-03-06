@@ -1,6 +1,0 @@
-name: ROOT
-title: Semantic Version Plugin
-version: ~
-nav:
-  - modules/ROOT/nav.adoc
-  - modules/research/nav.adoc

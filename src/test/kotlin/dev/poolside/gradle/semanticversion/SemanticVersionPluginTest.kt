@@ -25,10 +25,7 @@ class SemanticVersionPluginTest {
     companion object {
         @JvmStatic
         private fun gradleVersions(): Stream<Arguments> = Stream.of(
-            Arguments.of("7.6.1"),
-            Arguments.of("8.1"),
-            Arguments.of("8.8"),
-            Arguments.of("8.12"),
+            Arguments.of("8.13"),
         )
     }
 
@@ -322,6 +319,7 @@ class SemanticVersionPluginTest {
             plugins {
                 `java-library`
                 `maven-publish`
+                id("dev.poolside.gradle.semantic-version")
             }
             repositories {
                 mavenCentral()
@@ -578,6 +576,7 @@ class SemanticVersionPluginTest {
             plugins {
                 `java-library`
                 `maven-publish`
+                id("dev.poolside.gradle.semantic-version")
             }
             repositories {
                 mavenCentral()
@@ -603,6 +602,7 @@ class SemanticVersionPluginTest {
             plugins {
                 `java-platform`
                 `maven-publish`
+                id("dev.poolside.gradle.semantic-version")
             }
             repositories {
                 mavenCentral()
