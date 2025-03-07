@@ -2,6 +2,7 @@ package dev.poolside.gradle.semanticversion
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.internal.artifacts.DependencyManagementServices
+import org.gradle.api.internal.artifacts.ivyservice.ivyresolve.strategy.Version
 import org.gradle.api.internal.artifacts.repositories.ResolutionAwareRepository
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
@@ -37,17 +38,21 @@ abstract class SemanticVersionTask : DefaultTask() {
     }
 
     private fun automatic() {
-        extension.repositories.forEach {
-            if (it is ResolutionAwareRepository) {
-                val resolver = it.createResolver()
-                extension.publications.forEach { publication ->
-                    val pub = publication as MavenPublication
-                    checkVersion(pub.version)
-                    val (key, version) = VersionFinder.findVersion(logger, dependencyService, resolver, pub)
-                    pub.version = version
-                    versions[key] = version
+        extension.publications.forEach { publication ->
+            val pub = publication as MavenPublication
+            checkVersion(pub.version)
+            val fetchedVersions = mutableListOf<Version>()
+            extension.repositories.forEach {
+                if (it is ResolutionAwareRepository) {
+                    val resolver = it.createResolver()
+                    val version = VersionFinder.findVersion(logger, dependencyService, resolver, pub)
+                    fetchedVersions.add(version)
                 }
             }
+            val max = VersionFinder.findMaxVersion(fetchedVersions)
+            val key = "${pub.groupId}:${pub.artifactId}"
+            pub.version = max.toString()
+            versions[key] = max.toString()
         }
         extension.publications.forEach { publication ->
             val pub = publication as MavenPublication

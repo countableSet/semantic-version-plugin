@@ -33,6 +33,8 @@ class SemanticVersionPluginTest {
     lateinit var testProjectDir: File
     @TempDir
     lateinit var mavenRepo: File
+    @TempDir
+    lateinit var secondMavenRepo: File
 
     @ParameterizedTest(name = "{index} gradle version {0}")
     @MethodSource("gradleVersions")
@@ -51,6 +53,70 @@ class SemanticVersionPluginTest {
             publishing {
                 repositories {
                     maven { url = uri("${mavenRepo.absolutePath}") }
+                }
+                publications {
+                    create<MavenPublication>("mavenJava") {
+                        artifactId = "my-library"
+                        from(components["java"])
+                    }
+                }
+            }
+        """.trimIndent()
+        val settings = """rootProject.name = "testing""""
+        File(testProjectDir, "build.gradle.kts").writeText(build)
+        File(testProjectDir, "settings.gradle.kts").writeText(settings)
+        GradleRunner.create()
+            .withPluginClasspath()
+            .withProjectDir(testProjectDir)
+            .withGradleVersion(gradleVersion)
+            .withArguments("publish")
+//            .withDebug(true)
+            .build()
+        var pomFile = testProjectDir.walk().filter { it.name.startsWith("pom") }.first()
+        var pom = PomParser.parse(pomFile.absolutePath)
+        assertEquals("0.1.0", pom.version)
+        var jarFile = mavenRepo.walk().filter { it.name.endsWith("my-library-0.1.0.jar") }.first()
+        assertTrue(jarFile.absolutePath.endsWith("/dev/poolside/test/my-library/0.1.0/my-library-0.1.0.jar"), jarFile.absolutePath)
+        var publishedPom = mavenRepo.walk().filter { it.name.equals("my-library-0.1.0.pom") }.first()
+        pom = PomParser.parse(publishedPom.absolutePath)
+        assertEquals("0.1.0", pom.version)
+
+        // should +1
+        GradleRunner.create()
+            .withPluginClasspath()
+            .withProjectDir(testProjectDir)
+            .withGradleVersion(gradleVersion)
+            .withArguments("publish")
+//            .withDebug(true)
+            .build()
+        pomFile = testProjectDir.walk().filter { it.name.startsWith("pom") }.last()
+        pom = PomParser.parse(pomFile.absolutePath)
+        assertEquals("0.1.1", pom.version)
+        jarFile = mavenRepo.walk().filter { it.name.endsWith("my-library-0.1.1.jar") }.last()
+        assertTrue(jarFile.absolutePath.endsWith("/dev/poolside/test/my-library/0.1.1/my-library-0.1.1.jar"), jarFile.absolutePath)
+        publishedPom = mavenRepo.walk().filter { it.name.equals("my-library-0.1.1.pom") }.last()
+        pom = PomParser.parse(publishedPom.absolutePath)
+        assertEquals("0.1.1", pom.version)
+    }
+
+    @ParameterizedTest(name = "{index} gradle version {0}")
+    @MethodSource("gradleVersions")
+    fun `project version set correctly with two repos`(gradleVersion: String) {
+        val build = """
+            plugins {
+                java
+                `maven-publish`
+                id("dev.poolside.gradle.semantic-version")
+            }
+            repositories {
+                maven { url = uri("${mavenRepo.absolutePath}") }
+            }
+            group = "dev.poolside.test"
+            version = "0.1"
+            publishing {
+                repositories {
+                    maven { url = uri("${mavenRepo.absolutePath}") }
+                    maven { url = uri("${secondMavenRepo.absolutePath}") }
                 }
                 publications {
                     create<MavenPublication>("mavenJava") {
