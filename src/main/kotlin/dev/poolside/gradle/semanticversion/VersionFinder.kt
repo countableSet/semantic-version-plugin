@@ -18,7 +18,7 @@ object VersionFinder {
     private val versionParser = VersionParser()
     private val versionComparator = DefaultVersionComparator().asVersionComparator()
 
-    fun findVersion(logger: Logger, dependencyService: DependencyManagementServices, resolver: ConfiguredModuleComponentRepository, publication: MavenPublication): Pair<String, String> {
+    fun findVersion(logger: Logger, dependencyService: DependencyManagementServices, resolver: ConfiguredModuleComponentRepository, publication: MavenPublication): Version {
         val versions = listVersions(logger, dependencyService, resolver, publication, "${publication.version}+")
         var latestVersion: Version? = null
         versions.map { version -> versionParser.transform(version) }.forEach { version ->
@@ -36,7 +36,7 @@ object VersionFinder {
             logger.lifecycle("Resolved published version of '${publication.groupId}:${publication.artifactId}:${publication.version}' to '$newVersion'")
             newVersion
         }
-        return "${publication.groupId}:${publication.artifactId}" to version
+        return VersionParser().transform(version)
     }
 
     fun versionExists(logger: Logger, dependencyService: DependencyManagementServices, resolver: ConfiguredModuleComponentRepository, publication: MavenPublication): Boolean {
@@ -73,5 +73,15 @@ object VersionFinder {
         val parts = found.numericParts.filterNotNull()
         val last = parts.last() + 1
         return parts.dropLast(1).joinToString(".") + ".$last"
+    }
+
+    fun findMaxVersion(versions: List<Version>): Version {
+        var max = versions[0]
+        for (version in versions) {
+            if (versionComparator.compare(version, max) > 0) {
+                max = version
+            }
+        }
+        return max
     }
 }
