@@ -102,8 +102,8 @@ abstract class SemanticVersionTask : DefaultTask() {
                         val group = dep.getElementsByTagName("groupId").item(0).textContent
                         val artifact = dep.getElementsByTagName("artifactId").item(0).textContent
                         val key = "${group}:${artifact}"
-                        if (versions.containsKey(key)) {
-                            val version = versions[key]
+                        val version = versions[key] ?: publicationVersion(group, artifact)
+                        if (version != null) {
                             dep.getElementsByTagName("version").item(0).textContent = version
                         }
                     }
@@ -113,4 +113,12 @@ abstract class SemanticVersionTask : DefaultTask() {
             }
         }
     }
+
+    private fun publicationVersion(groupId: String, artifactId: String): String? =
+        project.rootProject.allprojects
+            .asSequence()
+            .mapNotNull { it.extensions.findByType(PublishingExtension::class.java) }
+            .flatMap { it.publications.withType(MavenPublication::class.java).asSequence() }
+            .find { it.groupId == groupId && it.artifactId == artifactId }
+            ?.version
 }

@@ -705,6 +705,10 @@ class SemanticVersionPluginTest {
             pomFile.forEachLine { println(it) }
             val pom = PomParser.parse(pomFile.absolutePath)
             assertEquals("0.1.0", pom.version)
+            val lib = pom.dependencies?.dependency?.find { it.groupId == "dev.poolside.test" }
+            if (lib != null) {
+                assertEquals("0.1.0", lib.version)
+            }
         }
         val valid = mutableListOf(
             "${mavenRepo.absolutePath}/dev/poolside/test/my-library/0.1.0/my-library-0.1.0.jar",

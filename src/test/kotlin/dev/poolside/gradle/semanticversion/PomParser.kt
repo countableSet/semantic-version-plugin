@@ -2,6 +2,7 @@ package dev.poolside.gradle.semanticversion
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.dataformat.xml.XmlMapper
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import java.io.File
@@ -15,4 +16,11 @@ object PomParser {
     }
 }
 
-data class Pom(val groupId: String, val artifactId: String, val version: String)
+data class Pom(val groupId: String, val artifactId: String, val version: String, val dependencies: Dependencies? = null)
+
+data class Dependencies(
+    @field:JacksonXmlElementWrapper(useWrapping = false)
+    val dependency: List<Dependency> = emptyList()
+)
+
+data class Dependency(val groupId: String, val artifactId: String, val version: String)

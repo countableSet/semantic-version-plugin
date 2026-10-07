@@ -26,5 +26,13 @@ class SemanticVersionPlugin : Plugin<Project> {
         project.tasks.withType<GenerateMavenPom> {
             this.dependsOn("semanticVersion")
         }
+        project.gradle.projectsEvaluated {
+            val semanticVersionTasks = project.rootProject.allprojects.flatMap {
+                it.tasks.withType(SemanticVersionTask::class.java).toList()
+            }
+            project.tasks.withType<GenerateMavenPom>().configureEach {
+                dependsOn(semanticVersionTasks)
+            }
+        }
     }
 }
