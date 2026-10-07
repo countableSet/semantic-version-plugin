@@ -1,13 +1,14 @@
 package dev.poolside.gradle.semanticversion
 
+import org.gradle.api.internal.artifacts.DependencyManagementParameters
 import org.gradle.api.internal.artifacts.DependencyManagementServices
 import org.gradle.api.internal.artifacts.ivyservice.ivyresolve.ConfiguredModuleComponentRepository
 import org.gradle.api.internal.artifacts.ivyservice.ivyresolve.strategy.DefaultVersionComparator
 import org.gradle.api.internal.artifacts.ivyservice.ivyresolve.strategy.Version
 import org.gradle.api.internal.artifacts.ivyservice.ivyresolve.strategy.VersionParser
-import org.gradle.api.internal.initialization.StandaloneDomainObjectContext
 import org.gradle.api.logging.Logger
 import org.gradle.api.publish.maven.MavenPublication
+import org.gradle.internal.Describables
 import org.gradle.internal.component.external.model.DefaultModuleComponentSelector
 import org.gradle.internal.component.model.DefaultComponentOverrideMetadata
 import org.gradle.internal.resolve.result.DefaultBuildableModuleVersionListingResolveResult
@@ -48,7 +49,7 @@ object VersionFinder {
         val remote = resolver.remoteAccess
         val local = resolver.localAccess
 
-        val handler = dependencyService.newDetachedResolver(StandaloneDomainObjectContext.ANONYMOUS).dependencyHandler
+        val handler = dependencyService.newDetachedResolver(DependencyManagementParameters(Describables.of("ANONYMOUS"), "", false, false, false)).dependencyHandler
         val dep = handler.create(group = publication.groupId, name = publication.artifactId, version = versionSearch)
         val selector = DefaultModuleComponentSelector.newSelector(dep.module, dep.versionConstraint)
 
