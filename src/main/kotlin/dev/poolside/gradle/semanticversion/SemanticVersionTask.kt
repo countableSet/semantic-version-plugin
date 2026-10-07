@@ -10,9 +10,11 @@ import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskCollection
+import org.gradle.work.DisableCachingByDefault
 import org.w3c.dom.Element
 import javax.inject.Inject
 
+@DisableCachingByDefault(because = "in case a version was uploaded, should always check")
 abstract class SemanticVersionTask : DefaultTask() {
 
     private val versionRegex = "^\\d+\\.\\d+\$".toRegex()
