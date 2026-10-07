@@ -710,6 +710,17 @@ class SemanticVersionPluginTest {
                 assertEquals("0.1.0", lib.version)
             }
         }
+        testProjectDir.walk().filter { it.name.startsWith("module.json") }.forEach { file ->
+            file.forEachLine { println(it) }
+            val module = ModuleParser.parse(file.absolutePath)
+            assertEquals("0.1.0", module.component.version)
+            module.variants.forEach { variant ->
+                val dep = variant.dependencies?.find { it.group == "dev.poolside.test" }
+                if (dep != null) {
+                    assertEquals("0.1.0", dep.version.requires)
+                }
+            }
+        }
         val valid = mutableListOf(
             "${mavenRepo.absolutePath}/dev/poolside/test/my-library/0.1.0/my-library-0.1.0.jar",
             "${mavenRepo.absolutePath}/dev/poolside/test/my-sublibrary/0.1.0/my-sublibrary-0.1.0.jar"
