@@ -50,7 +50,7 @@ object VersionFinder {
         val local = resolver.localAccess
 
         val handler = dependencyService.newDetachedResolver(DependencyManagementParameters(Describables.of("ANONYMOUS"), "", false, false, false)).dependencyHandler
-        val dep = handler.create(group = publication.groupId, name = publication.artifactId, version = versionSearch)
+        val dep = handler.create(dependencyNotation = "${publication.groupId}:${publication.artifactId}:${versionSearch}", dependencyConfiguration = {})
         val selector = DefaultModuleComponentSelector.newSelector(dep.module, dep.versionConstraint)
 
         val result = DefaultBuildableModuleVersionListingResolveResult()
